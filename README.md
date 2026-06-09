@@ -1,6 +1,10 @@
-# WebSSH Gateway 社区版
+# WebSSH Gateway
 
-> English version: [README.en.md](./README.en.md)
+> 🏠 上游: [beibeizi/WebSSHGateway](https://github.com/beibeizi/WebSSHGateway) (社区版)
+> 📖 English: [README.en.md](./README.en.md)
+> 🐳 镜像: `ghcr.io/callacat/WebSSHGateway:latest`
+
+[![Publish Docker Image](https://github.com/callacat/WebSSHGateway/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/callacat/WebSSHGateway/actions/workflows/docker-publish.yml)
 
 WebSSH Gateway 是一个面向运维和开发场景的浏览器 SSH 网关。你可以在 Web 页面内完成 SSH 连接管理、终端会话、系统监控和文件管理，减少多终端切换带来的成本。
 
@@ -54,25 +58,26 @@ WebSSH Gateway 是一个面向运维和开发场景的浏览器 SSH 网关。你
 
 ### 方式 2：Docker 镜像部署
 
-Docker Hub 镜像：`https://hub.docker.com/r/beibeizi/websshgateway`
-
-快速启动示例（注意：`SECRET_KEY` 仅为示例，自行部署必须替换，32 位 UUID 即可）：
-
 ```bash
-docker run -d -p 8080:8080 -e SECRET_KEY="67e457b4eab14012b34382b3d634f297" beibeizi/websshgateway:latest
+# 从 ghcr.io 拉取镜像
+docker pull ghcr.io/callacat/WebSSHGateway:latest
+
+# 快速启动（SECRET_KEY 必须替换，32 位字符）
+docker run -d -p 8080:8080 \
+  -e SECRET_KEY="your-32-char-secret-key-here-change-it" \
+  -v webssh-data:/data \
+  ghcr.io/callacat/WebSSHGateway:latest
 ```
 
 ```bash
-export DOCKER_IMAGE=beibeizi/websshgateway:latest
-
-# 也可以自行构建本地镜像
+# 也可自行构建本地镜像
 docker build -t webssh-gateway:community .
 docker run -d \
   --name webssh-gateway \
   -p 8080:8080 \
   --env-file .env \
   -v webssh-data:/data \
-  ${DOCKER_IMAGE:-webssh-gateway:community}
+  webssh-gateway:community
 ```
 
 更完整说明见 [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)。
@@ -92,7 +97,10 @@ docker run -d \
 ├── frontend/                 # React 前端
 ├── session-transfer-files/   # 增强会话所需二进制文件
 ├── docs/                     # 项目文档
+├── .github/workflows/        # GitHub Actions CI/CD
 ├── .env.example              # 环境变量示例
+├── CHANGELOG.md              # 变更记录
+├── VERSION                   # 版本号
 ├── Dockerfile                # 镜像构建
 ├── docker-compose.yml        # 本地容器编排
 └── LICENSE

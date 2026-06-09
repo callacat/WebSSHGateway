@@ -1,6 +1,10 @@
-# WebSSH Gateway Community Edition
+# WebSSH Gateway
 
-> English document. 中文文档请见：[README.md](./README.md)
+> Upstream: [beibeizi/WebSSHGateway](https://github.com/beibeizi/WebSSHGateway) (Community Edition)
+> 中文文档: [README.md](./README.md)
+> 🐳 Image: `ghcr.io/callacat/WebSSHGateway:latest`
+
+[![Publish Docker Image](https://github.com/callacat/WebSSHGateway/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/callacat/WebSSHGateway/actions/workflows/docker-publish.yml)
 
 WebSSH Gateway is a browser-based SSH gateway for operations and development teams. It provides SSH connection management, terminal sessions, system monitoring, and file operations in a single web interface.
 
