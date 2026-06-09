@@ -666,6 +666,13 @@ class SessionManager:
                 raise RuntimeError(
                     f"tmux session not available after create (fingerprint={enhanced_fingerprint}, has_exit={res_has.exit_status})"
                 )
+            # Inject locale into the tmux shell so non-ASCII characters display correctly.
+            # The session is detached, so keystrokes are processed silently by the shell
+            # without visible echo. This works regardless of SSH server AcceptEnv config.
+            await client.run(
+                f"{quoted_remote_binary} send-keys -t {quoted_fingerprint} 'export LANG=C.UTF-8' Enter",
+                check=False,
+            )
             await session._collect_tmux_metrics("create_before_attach", pty.rows, pty.cols)
             # Use exec to avoid silently falling back to an interactive shell
             # when attach fails.
