@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -54,3 +55,25 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
+
+      - name: Delete old untagged/orphaned package versions
+        continue-on-error: true
+        shell: bash
+        run: |
+          REPO="${{ github.repository }}"
+          OWNER="${REPO%%/*}"
+          PACKAGE="${REPO#*/}"
+          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          PACKAGE="${PACKAGE,,}"
+          versions=$(curl -s -H "Authorization: Bearer $TOKEN" \
+            "https://api.github.com/users/${OWNER}/packages/container/${PACKAGE}/versions?per_page=30")
+          orphaned=$(echo "$versions" | jq -r \
+            '.[] | select(.metadata.container.tags == null or .metadata.container.tags == []) | .id')
+          echo "$orphaned" | tail -n +4 | while read -r id; do
+            [ -z "$id" ] && continue
+            echo "Deleting orphaned version: $id"
+            curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
+              "https://api.github.com/users/${OWNER}/packages/container/${PACKAGE}/versions/$id"
+          done
