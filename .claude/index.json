@@ -1,0 +1,136 @@
+{
+  "last_scanned": "2026-06-09T15:15:16+00:00",
+  "total_files_estimated": 68,
+  "total_files_scanned": 65,
+  "coverage_percent": 95.6,
+  "truncated": false,
+  "claude_md_files_created": [
+    "/tmp/WebSSHGateway/CLAUDE.md",
+    "/tmp/WebSSHGateway/backend/CLAUDE.md",
+    "/tmp/WebSSHGateway/backend/app/api/CLAUDE.md",
+    "/tmp/WebSSHGateway/backend/app/core/CLAUDE.md",
+    "/tmp/WebSSHGateway/backend/app/models/CLAUDE.md",
+    "/tmp/WebSSHGateway/backend/app/services/CLAUDE.md",
+    "/tmp/WebSSHGateway/frontend/CLAUDE.md",
+    "/tmp/WebSSHGateway/frontend/src/pages/CLAUDE.md",
+    "/tmp/WebSSHGateway/frontend/src/components/CLAUDE.md",
+    "/tmp/WebSSHGateway/frontend/src/lib/CLAUDE.md",
+    "/tmp/WebSSHGateway/docs/CLAUDE.md"
+  ],
+  "modules": [
+    {
+      "path": "backend",
+      "language": "Python (FastAPI)",
+      "entry": "app/main.py",
+      "has_tests": false,
+      "has_config": true,
+      "coverage": {
+        "api_scanned": true,
+        "models_scanned": true,
+        "services_scanned": true,
+        "core_scanned": true
+      },
+      "gaps": [
+        "No test directory found (tests/)",
+        "No Alembic/migration directory",
+        "session-transfer-files directory referenced in Dockerfile but missing from repo"
+      ]
+    },
+    {
+      "path": "backend/app/api",
+      "language": "Python",
+      "entry": "dependencies.py",
+      "has_tests": false,
+      "coverage": {
+        "10_route_files_scanned": true
+      },
+      "gaps": []
+    },
+    {
+      "path": "backend/app/core",
+      "language": "Python",
+      "entry": "config.py",
+      "has_tests": false,
+      "coverage": {
+        "6_core_files_scanned": true
+      },
+      "gaps": []
+    },
+    {
+      "path": "backend/app/models",
+      "language": "Python (SQLAlchemy)",
+      "entry": "user.py",
+      "has_tests": false,
+      "coverage": {
+        "4_model_files_scanned": true
+      },
+      "gaps": []
+    },
+    {
+      "path": "backend/app/services",
+      "language": "Python",
+      "entry": "ssh_manager.py",
+      "has_tests": false,
+      "coverage": {
+        "7_service_files_scanned": true
+      },
+      "gaps": [
+        "ssh_manager.py only partially read (150 lines of ~400+)"
+      ]
+    },
+    {
+      "path": "frontend",
+      "language": "TypeScript/React",
+      "entry": "src/main.tsx",
+      "has_tests": false,
+      "has_config": true,
+      "coverage": {
+        "pages_scanned": true,
+        "components_scanned": true,
+        "lib_scanned": true,
+        "hooks_scanned": true,
+        "session_subpages_scanned": true,
+        "terminal_subpages_scanned": true
+      },
+      "gaps": [
+        "No test directory found (tests/ or __tests__/)",
+        "vite.config.ts exists (referenced in package.json) but not scanned"
+      ]
+    },
+    {
+      "path": "docs",
+      "language": "Markdown",
+      "entry": "-",
+      "has_tests": false,
+      "coverage": {
+        "documentation_scanned": true
+      },
+      "gaps": []
+    }
+  ],
+  "ignored": {
+    "total_skipped": 14,
+    "details": {
+      ".git/objects": 7,
+      "docs/images": 6,
+      "package-lock.json": 1
+    },
+    "reasons": [
+      "Git internal objects (pack files)",
+      "Binary image files",
+      "Auto-generated lock file"
+    ]
+  },
+  "gaps": [
+    "No test files across the entire project",
+    "No Alembic migration directory",
+    "session-transfer-files directory referenced in Dockerfile but missing from repository",
+    "vite.config.ts exists but was not scanned",
+    "ssh_manager.py was only partially read (150 of ~400+ lines)"
+  ],
+  "next_recommended_scans": [
+    "backend/app/services/ssh_manager.py (remaining lines) - core SSH session management logic",
+    "session-transfer-files/ - referenced in config and Dockerfile, not present in repo",
+    "frontend/vite.config.ts - build configuration"
+  ]
+}
