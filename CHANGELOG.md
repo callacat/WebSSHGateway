@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2] - 2026-06-09
+
+### Fixed
+
+- **修复参数名错误**: `client_encoding` → `encoding`
+  asyncssh 2.16.0 中正确的参数名是 `encoding`，修正后终端面板连接 SSH 恢复正常
+
 ## [0.1.1] - 2026-06-09
 
 ### Fixed
