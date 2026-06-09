@@ -617,8 +617,13 @@ class SessionManager:
             quoted_fingerprint = shlex.quote(enhanced_fingerprint)
             target_window = shlex.quote(f"{enhanced_fingerprint}:0")
             target_pane = shlex.quote(f"{enhanced_fingerprint}:0.0")
+            # Inject locale into the tmux session by prefixing LANG=C.UTF-8 on creation.
+            # client.run() goes through the user's shell, so shell-level env works even
+            # when the SSH server does not accept env(LANG) via AcceptEnv.
+            # The tmux session and all shells inside it will inherit C.UTF-8.
+            locale_prefix = "LANG=C.UTF-8 "
             res_new = await client.run(
-                f"{quoted_remote_binary} new-session -Ad -s {quoted_fingerprint} -x {pty.cols} -y {pty.rows}",
+                f"{locale_prefix}{quoted_remote_binary} new-session -Ad -s {quoted_fingerprint} -x {pty.cols} -y {pty.rows}",
                 check=False,
             )
             res_status = await client.run(f"{quoted_remote_binary} set-option -t {quoted_fingerprint} status off", check=False)
@@ -666,13 +671,6 @@ class SessionManager:
                 raise RuntimeError(
                     f"tmux session not available after create (fingerprint={enhanced_fingerprint}, has_exit={res_has.exit_status})"
                 )
-            # Inject locale into the tmux shell so non-ASCII characters display correctly.
-            # The session is detached, so keystrokes are processed silently by the shell
-            # without visible echo. This works regardless of SSH server AcceptEnv config.
-            await client.run(
-                f"{quoted_remote_binary} send-keys -t {quoted_fingerprint} 'export LANG=C.UTF-8' Enter",
-                check=False,
-            )
             await session._collect_tmux_metrics("create_before_attach", pty.rows, pty.cols)
             # Use exec to avoid silently falling back to an interactive shell
             # when attach fails.
