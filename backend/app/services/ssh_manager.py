@@ -417,6 +417,7 @@ class SessionManager:
             client_keys=client_keys,
             known_hosts=known_hosts,
             keepalive_interval=self._keepalive_interval,
+            client_encoding="utf-8",
         )
 
     async def _connect_with_known_hosts(
