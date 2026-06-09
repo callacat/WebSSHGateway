@@ -604,6 +604,7 @@ class SessionManager:
             term_type=pty.term,
             term_size=(pty.cols, pty.rows),
             request_pty=True,
+            environ={"LANG": "C.UTF-8"},
         )
         session.channel = channel
 

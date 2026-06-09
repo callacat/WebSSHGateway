@@ -343,10 +343,12 @@ export function useTerminalSocket({
 
       term = new Terminal({
         theme: initialTheme === "light" ? lightTerminalTheme : darkTerminalTheme,
-        fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+        fontFamily:
+          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Noto Sans Mono CJK SC', 'WenQuanYi Micro Hei Mono', monospace",
         fontSize: 14,
         cursorBlink: true,
         scrollback: 100000,
+        unicodeVersion: "11",
       });
       const fit = new FitAddon();
       term.loadAddon(fit);
