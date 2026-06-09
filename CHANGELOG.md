@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.2.0] - 2026-06-09
+
+### Fixed
+
+- **终端非 ASCII 字符显示修复**: 全链路排查并修复中文/特殊字符无法显示的问题
+  - **系统层**: 将 `/etc/default/locale` 从 `LANG="C"` 改为 `LANG="C.UTF-8"`，避免 PAM 在 SSH 会话初始化时覆盖 locale（根本原因）
+  - **后端 SSH 会话**: 在 `create_session()` 中添加 `env={"LANG": "C.UTF-8"}`，通知 SSH 服务端设置 UTF-8 locale
+  - **增强会话 (tmux)**: 在 `tmux new-session` 时添加 `LANG=C.UTF-8` 前缀，绕过 SSH 服务端 AcceptEnv 限制
+  - **前端 xterm.js**: 添加 `unicodeVersion: "11"` 启用 CJK 宽字符支持，扩展字体栈包含中文字体回退
+- **修复参数名错误**: `create_session(environ=...)` → `create_session(env=...)`
+  asyncssh 2.16.0 中正确的参数名是 `env`，修复后会话创建不再抛出 `TypeError`
+
+### Changed
+
+- 系统设置默认 `JWT_ACCESS_TTL_HOURS` 改为 24 小时
+
 ## [0.1.2] - 2026-06-09
 
 ### Fixed
