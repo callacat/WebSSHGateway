@@ -9,6 +9,7 @@
   - **后端 SSH 会话**: 在 `create_session()` 中添加 `env={"LANG": "C.UTF-8"}`，通知 SSH 服务端设置 UTF-8 locale
   - **增强会话 (tmux)**: 在 `tmux new-session` 时添加 `LANG=C.UTF-8` 前缀，绕过 SSH 服务端 AcceptEnv 限制
   - **前端 xterm.js**: 添加 `unicodeVersion: "11"` 启用 CJK 宽字符支持，扩展字体栈包含中文字体回退
+  - **SSH 通道编码**: 在 channel 创建后显式调用 `channel.set_encoding('utf-8')`，确保 asyncssh 通道层正确解码非 ASCII 字符
 - **修复参数名错误**: `create_session(environ=...)` → `create_session(env=...)`
   asyncssh 2.16.0 中正确的参数名是 `env`，修复后会话创建不再抛出 `TypeError`
 
