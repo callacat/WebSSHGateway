@@ -606,6 +606,7 @@ class SessionManager:
             request_pty=True,
             env={"LANG": "C.UTF-8"},
         )
+        channel.set_encoding("utf-8")
         session.channel = channel
 
         if enhanced_enabled and enhanced_fingerprint and tmux_binary_path:
