@@ -18,6 +18,7 @@ from app.models.connection import Connection
 from app.models.session import SessionRecord
 from app.schemas.api import (
     SessionCreateRequest,
+    SessionNameUpdateRequest,
     SessionOrderUpdateRequest,
     SessionNoteUpdateRequest,
     SessionResponse,
@@ -141,6 +142,7 @@ def _build_session_response(
         host=conn.host,
         username=conn.username,
         name=conn.name,
+        session_name=record.session_name,
         note=record.note,
         session_order=record.session_order or 0,
         enhanced_enabled=bool(record.enhanced_enabled),
@@ -508,6 +510,34 @@ async def update_session_note(
     broadcaster: SessionBroadcaster = state.session_broadcaster
     await broadcaster.broadcast(user.id, response.model_dump_json())
     return response
+
+@router.patch("/{session_id}/name", response_model=SessionResponse)
+async def update_session_name(
+    session_id: str,
+    payload: SessionNameUpdateRequest,
+    state: AppState = Depends(get_state),
+    user=Depends(get_current_user),
+    db=Depends(get_db),
+) -> SessionResponse:
+    record = db.execute(
+        select(SessionRecord).where(SessionRecord.id == session_id, SessionRecord.user_id == user.id)
+    ).scalar_one_or_none()
+    if not record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    record.session_name = payload.session_name
+    record.last_activity = utc_now()
+
+    conn = db.execute(select(Connection).where(Connection.id == record.connection_id)).scalar_one_or_none()
+    if not conn:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Connection not found")
+
+    managed_session = state.session_manager.get_session(record.id)
+    response = _build_session_response(record, conn, managed_session)
+    broadcaster: SessionBroadcaster = state.session_broadcaster
+    await broadcaster.broadcast(user.id, response.model_dump_json())
+    return response
+
 
 
 @router.patch("/order")

@@ -8,6 +8,7 @@ type UseSessionsPollingOptions = {
   sessionsRef: React.MutableRefObject<Session[]>;
   setSessions: React.Dispatch<React.SetStateAction<Session[]>>;
   setNoteDrafts: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setNameDrafts: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   push: (message: string) => void;
   t: (zh: string, en: string) => string;
   reportNetworkHint: (profile: "good" | "degraded" | "poor", durationMs: number) => void;
@@ -19,6 +20,7 @@ export function useSessionsPolling({
   sessionsRef,
   setSessions,
   setNoteDrafts,
+  setNameDrafts,
   push,
   t,
   reportNetworkHint,
@@ -58,6 +60,21 @@ export function useSessionsPolling({
           });
           return next;
         });
+        setNameDrafts((prev) => {
+          const previousSessions = sessionsRef.current;
+          const next = { ...prev };
+          sessionList.forEach((session) => {
+            if (!(session.id in next)) {
+              next[session.id] = session.session_name ?? "";
+              return;
+            }
+            const previousSession = previousSessions.find((item) => item.id === session.id);
+            if (next[session.id] === (previousSession?.session_name ?? "")) {
+              next[session.id] = session.session_name ?? "";
+            }
+          });
+          return next;
+        });
       } catch {
         // 静默处理刷新错误
       } finally {
@@ -71,7 +88,7 @@ export function useSessionsPolling({
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [sessionsPollIntervalMs, preserveOrderIfDragging, setSessions, setNoteDrafts, sessionsRef]);
+  }, [sessionsPollIntervalMs, preserveOrderIfDragging, setSessions, setNoteDrafts, setNameDrafts, sessionsRef]);
 
   React.useEffect(() => {
     const userId = localStorage.getItem("user_id") || sessionStorage.getItem("user_id");
@@ -99,6 +116,9 @@ export function useSessionsPolling({
           }
           return prev;
         });
+        if (payload.id && "session_name" in payload) {
+          setNameDrafts((prev) => ({ ...prev, [payload.id as string]: payload.session_name ?? "" }));
+        }
         if (payload.id && "note" in payload) {
           setNoteDrafts((prev) => ({ ...prev, [payload.id as string]: payload.note ?? "" }));
         }
@@ -124,5 +144,5 @@ export function useSessionsPolling({
       }
     };
     return () => socket.close();
-  }, [push, reportNetworkHint, setSessions, setNoteDrafts, t]);
+  }, [push, reportNetworkHint, setSessions, setNoteDrafts, setNameDrafts, t]);
 }

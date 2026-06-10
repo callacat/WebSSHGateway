@@ -49,3 +49,6 @@ tasks/
 # Local contributor instructions
 AGENTS.md
 .claude/worktrees/
+
+# Local tool data
+.memsearch/

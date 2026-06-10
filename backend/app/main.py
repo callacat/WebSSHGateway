@@ -22,6 +22,7 @@ from app.services.bootstrap import (
     ensure_session_enhanced_columns,
     ensure_session_note_column,
     ensure_session_order_column,
+    ensure_session_name_column,
     ensure_system_settings,
 )
 
@@ -47,6 +48,7 @@ def create_app() -> FastAPI:
     ensure_connection_arch_columns(database)
     ensure_session_enhanced_columns(database)
     ensure_session_order_column(database)
+    ensure_session_name_column(database)
     ensure_system_settings(database)
 
     with database.session() as db_session:

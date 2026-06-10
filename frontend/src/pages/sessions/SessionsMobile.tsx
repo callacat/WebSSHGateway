@@ -105,6 +105,7 @@ export function SessionsMobile({ state }: SessionsMobileProps) {
         <div className="grid gap-4">
           {state.filteredSessions.map((session, index) => {
             const noteValue = state.noteDrafts[session.id] ?? "";
+            const nameValue = state.nameDrafts[session.id] ?? "";
             const canMoveUp = index > 0 && !state.ordering.savingOrder;
             const canMoveDown = index < state.filteredSessions.length - 1 && !state.ordering.savingOrder;
             return (
@@ -153,7 +154,20 @@ export function SessionsMobile({ state }: SessionsMobileProps) {
                 </div>
                 <div className="space-y-2">
                   <div>
-                    <p className="text-base font-semibold">{session.name}</p>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        placeholder={session.name}
+                        value={nameValue}
+                        maxLength={255}
+                        onChange={(event) => state.handleNameChange(session.id, event.target.value)}
+                        className={`text-lg font-semibold ${!state.isDark ? "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400" : ""}`}
+                      />
+                      {nameValue.trim() !== (session.session_name ?? "") ? (
+                        <Button variant="secondary" lightMode={!state.isDark} onClick={() => state.handleSaveName(session)}>
+                          {state.t("保存", "Save")}
+                        </Button>
+                      ) : null}
+                    </div>
                     <p className={`text-sm ${state.isDark ? "text-slate-400" : "text-slate-500"}`}>
                       {session.username}@{session.host}
                     </p>

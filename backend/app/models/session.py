@@ -13,6 +13,7 @@ class SessionRecord(TimestampMixin, Base):
     __tablename__ = "sessions"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    session_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     connection_id: Mapped[int] = mapped_column(Integer, ForeignKey("connections.id"))
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     status: Mapped[str] = mapped_column(String(32))

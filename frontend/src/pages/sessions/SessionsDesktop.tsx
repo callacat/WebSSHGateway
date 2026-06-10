@@ -119,6 +119,7 @@ export function SessionsDesktop({ state }: SessionsDesktopProps) {
             <div className="grid gap-4">
               {state.filteredSessions.map((session) => {
                 const noteValue = state.noteDrafts[session.id] ?? "";
+                const nameValue = state.nameDrafts[session.id] ?? "";
                 return (
                   <div
                     key={session.id}
@@ -156,7 +157,20 @@ export function SessionsDesktop({ state }: SessionsDesktopProps) {
                     </button>
                     <div className="flex flex-wrap items-start justify-between gap-4">
                       <div className="space-y-1">
-                        <p className="text-lg font-semibold">{session.name}</p>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder={session.name}
+                            value={nameValue}
+                            maxLength={255}
+                            onChange={(event) => state.handleNameChange(session.id, event.target.value)}
+                            className={`text-lg font-semibold ${!state.isDark ? "border-slate-300 bg-white text-slate-900 placeholder:text-slate-400" : ""}`}
+                          />
+                          {nameValue.trim() !== (session.session_name ?? "") ? (
+                            <Button variant="secondary" lightMode={!state.isDark} onClick={() => state.handleSaveName(session)}>
+                              {state.t("保存", "Save")}
+                            </Button>
+                          ) : null}
+                        </div>
                         <p className={`text-sm ${state.isDark ? "text-slate-400" : "text-slate-500"}`}>
                           {session.username}@{session.host}
                         </p>

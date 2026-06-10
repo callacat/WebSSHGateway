@@ -22,6 +22,7 @@ const CLIENT_TEXT_MAP: Record<string, { zh: string; en: string }> = {
   "重试连接失败": { zh: "重试连接失败", en: "Failed to retry connection" },
   "断开失败": { zh: "断开失败", en: "Failed to disconnect" },
   "保存备注失败": { zh: "保存备注失败", en: "Failed to save note" },
+  "保存会话名失败": { zh: "保存会话名失败", en: "Failed to save session name" },
   "保存排序失败": { zh: "保存排序失败", en: "Failed to save order" },
   "删除会话失败": { zh: "删除会话失败", en: "Failed to delete session" },
   "删除连接失败": { zh: "删除连接失败", en: "Failed to delete connection" },
@@ -163,6 +164,7 @@ export type Session = {
   host: string;
   username: string;
   name: string;
+  session_name?: string | null;
   note?: string | null;
   session_order?: number;
   enhanced_enabled?: boolean;
@@ -410,6 +412,19 @@ export async function updateSessionNote(sessionId: string, note: string | null):
   });
   if (!response.ok) {
     const detail = await safeError(response, "保存备注失败");
+    throw new Error(detail);
+  }
+  return response.json();
+}
+
+export async function updateSessionName(sessionId: string, sessionName: string | null): Promise<Session> {
+  const response = await fetch(`${HTTP_BASE}/sessions/${sessionId}/name`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getAuthHeader() },
+    body: JSON.stringify({ session_name: sessionName })
+  });
+  if (!response.ok) {
+    const detail = await safeError(response, "保存会话名失败");
     throw new Error(detail);
   }
   return response.json();

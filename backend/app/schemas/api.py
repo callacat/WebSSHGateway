@@ -93,6 +93,7 @@ class SessionResponse(BaseModel):
     host: str
     username: str
     name: str
+    session_name: Optional[str] = None
     note: Optional[str] = None
     session_order: int = 0
     enhanced_enabled: bool = False
@@ -118,6 +119,10 @@ class SessionStatusResponse(BaseModel):
 
 class SessionNoteUpdateRequest(BaseModel):
     note: Optional[str] = Field(default=None, max_length=1000)
+
+
+class SessionNameUpdateRequest(BaseModel):
+    session_name: Optional[str] = Field(default=None, max_length=255)
 
 
 class SessionOrderUpdateRequest(BaseModel):

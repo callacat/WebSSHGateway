@@ -15,6 +15,7 @@ import {
   retrySession,
   updateConnection,
   updateSessionNote,
+  updateSessionName,
 } from "../../lib/api";
 import { localizeText, normalizeTargetProfile, pickWorseProfile } from "./sessionsUtils";
 import { useSessionStatusSummary } from "./useSessionStatusSummary";
@@ -39,6 +40,7 @@ export function useSessionsState() {
     key_passphrase: "",
   });
   const [noteDrafts, setNoteDrafts] = React.useState<Record<string, string>>({});
+  const [nameDrafts, setNameDrafts] = React.useState<Record<string, string>>({});
   const [showCreateForm, setShowCreateForm] = React.useState(false);
   const [editingConnection, setEditingConnection] = React.useState<Connection | null>(null);
   const [editForm, setEditForm] = React.useState({
@@ -99,6 +101,15 @@ export function useSessionsState() {
         });
         return next;
       });
+      setNameDrafts((prev) => {
+        const next = { ...prev };
+        sessionList.forEach((session) => {
+          if (!(session.id in next)) {
+            next[session.id] = session.session_name ?? "";
+          }
+        });
+        return next;
+      });
     } catch (error) {
       push(error instanceof Error ? error.message : t("加载失败", "Failed to load data"));
     } finally {
@@ -130,7 +141,8 @@ export function useSessionsState() {
     const normalizedSearch = search.toLowerCase();
     return orderedSessions.filter((session) => {
       const matchStatus = filter === "all" || session.status === filter;
-      const matchSearch = (session.name || "").toLowerCase().includes(normalizedSearch);
+      const matchSearch = (session.session_name || "").toLowerCase().includes(normalizedSearch)
+      || (session.name || "").toLowerCase().includes(normalizedSearch);
       return matchStatus && matchSearch;
     });
   }, [filter, orderedSessions, search]);
@@ -180,6 +192,7 @@ export function useSessionsState() {
     sessionsRef,
     setSessions,
     setNoteDrafts,
+    setNameDrafts,
     push,
     t,
     reportNetworkHint,
@@ -452,6 +465,21 @@ export function useSessionsState() {
       push(error instanceof Error ? error.message : t("保存失败", "Save failed"));
     }
   };
+  const handleNameChange = (sessionId: string, value: string) => {
+    setNameDrafts((prev) => ({ ...prev, [sessionId]: value }));
+  };
+
+  const handleSaveName = async (session: Session) => {
+    try {
+      const sessionName = (nameDrafts[session.id] ?? "").trim();
+      const response = await updateSessionName(session.id, sessionName.length > 0 ? sessionName : null);
+      setSessions((prev) => prev.map((item) => (item.id === response.id ? { ...item, ...response } : item)));
+      setNameDrafts((prev) => ({ ...prev, [session.id]: response.session_name ?? "" }));
+      push(t("会话名已保存", "Session name saved"));
+    } catch (error) {
+      push(error instanceof Error ? error.message : t("保存失败", "Save failed"));
+    }
+  };
 
   return {
     isDark,
@@ -477,6 +505,9 @@ export function useSessionsState() {
     editForm,
     setEditForm,
     noteDrafts,
+    nameDrafts,
+    handleNameChange,
+    handleSaveName,
     showSessionStatusSummary,
     sessionStatusEntries,
     enhancedRetryMaxAttempts,
