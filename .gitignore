@@ -48,3 +48,4 @@ tasks/
 
 # Local contributor instructions
 AGENTS.md
+.claude/worktrees/

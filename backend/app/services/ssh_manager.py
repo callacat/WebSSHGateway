@@ -599,14 +599,21 @@ class SessionManager:
 
             return TerminalSession()
 
+        # Use command to inject locale at shell level, bypassing PAM pam_env.so
+        # which reads /etc/default/locale and can override SSH env(LANG).
+        # Without this, remote hosts with LANG="C" in /etc/default/locale will
+        # fail to display non-ASCII characters (Chinese, etc.).
+        # exec ensures no double-shell; -l makes it a login shell so .profile is sourced.
+        # Keep env= as well for servers that honor it and don't override via PAM.
+        locale_command = 'exec env LANG=C.UTF-8 "${SHELL:-/bin/sh}" -l'
         channel, _ = await client.create_session(
             session_factory=_start_channel,
             term_type=pty.term,
             term_size=(pty.cols, pty.rows),
             request_pty=True,
             env={"LANG": "C.UTF-8"},
+            command=locale_command,
         )
-        channel.set_encoding("utf-8")
         session.channel = channel
 
         if enhanced_enabled and enhanced_fingerprint and tmux_binary_path:
