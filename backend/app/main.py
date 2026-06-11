@@ -47,8 +47,8 @@ def create_app() -> FastAPI:
     ensure_session_note_column(database)
     ensure_connection_arch_columns(database)
     ensure_session_enhanced_columns(database)
-    ensure_session_order_column(database)
     ensure_session_name_column(database)
+    ensure_session_order_column(database)
     ensure_system_settings(database)
 
     with database.session() as db_session:
