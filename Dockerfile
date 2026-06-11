@@ -8,6 +8,11 @@ RUN node node_modules/vite/bin/vite.js build
 
 FROM python:3.11-slim
 RUN useradd -m appuser
+ENV TZ=Asia/Shanghai
+RUN apt-get update && apt-get install -y --no-install-recommends tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY backend/requirements.txt /app/requirements.txt

@@ -18,6 +18,7 @@ services:
       - SSH_KNOWN_HOSTS=/data/known_hosts
       - SSH_ALLOW_UNKNOWN_HOSTS=false
       - CORS_ALLOW_ORIGINS=
+      - TZ=Asia/Shanghai
     volumes:
       - webssh-data:/data
 
