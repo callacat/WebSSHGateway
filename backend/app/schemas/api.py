@@ -134,3 +134,24 @@ class TerminalMessage(BaseModel):
     data: Optional[str] = None
     rows: Optional[int] = None
     cols: Optional[int] = None
+
+
+class QuickCommandCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=128)
+    group_name: str = Field(default="", max_length=64)
+    command: str = Field(min_length=1, max_length=1024)
+
+
+class QuickCommandUpdateRequest(BaseModel):
+    name: Optional[str] = Field(default=None, max_length=128)
+    group_name: Optional[str] = Field(default=None, max_length=64)
+    command: Optional[str] = Field(default=None, max_length=1024)
+    sort_order: Optional[int] = None
+
+
+class QuickCommandResponse(BaseModel):
+    id: int
+    name: str
+    group_name: str
+    command: str
+    sort_order: int
