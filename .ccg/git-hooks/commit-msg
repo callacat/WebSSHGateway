@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# ================================================================
+# commit-msg hook — 校验提交信息符合 Conventional Commits 格式
+# 阻塞不符合格式的提交。
+# ================================================================
+set -euo pipefail
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# 忽略 merge 提交
+if echo "$COMMIT_MSG" | head -1 | grep -qE '^Merge '; then
+  exit 0
+fi
+
+# 忽略 revert 提交
+if echo "$COMMIT_MSG" | head -1 | grep -qE '^(Revert|This reverts)'; then
+  exit 0
+fi
+
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)
+
+CONVENTIONAL_COMMITS_REGEX='^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\([a-zA-Z0-9_.-]+\))?!?:\ .+$'
+
+if echo "$FIRST_LINE" | grep -qE "$CONVENTIONAL_COMMITS_REGEX"; then
+  exit 0
+fi
+
+cat << EOF
+
+✘ 提交信息首行不符合 Conventional Commits 格式:
+
+  "$FIRST_LINE"
+
+正确格式示例:
+
+  feat(scope): add user login endpoint
+  fix: handle null pointer in parseConfig
+  docs: update API reference
+  refactor(core): extract validation logic
+  feat(api)!: remove deprecated v1 endpoints    ← 破坏性变更
+
+类型: feat | fix | docs | style | refactor | perf | test | chore | ci | build | revert
+scope (可选): 模块名，如 terminal auth api frontend
+
+如果确认要提交，请用 --no-verify 绕过（不推荐）。
+
+EOF
+exit 1

@@ -187,3 +187,31 @@ This project follows SemVer 2.0 + Conventional Commits 1.0 + Keep a Changelog 1.
 | `docs:` / `refactor:` / `test:` / `chore:` | No bump | No version change |
 
 See `VERSIONING.md` for full specification.
+
+## Quality Enforcement
+
+This project has three layers of quality enforcement. Read and follow these every time.
+
+### 1. Pre-flight Checklist (before writing any code)
+
+Read `.ccg/quality-checklist.md` Phase A. Must output and get your confirmation before starting.
+
+**Critical rule — execution mode selection** (Phase A item 1):
+Before writing code, I must show you three options: `[Claude solo]` / `[Codex+Gemini parallel review]` / `[Team orchestration]`. You pick. I don't default to anything.
+
+### 2. Git Hooks (block bad commits)
+
+- `.git/hooks/pre-commit` — Checks CHANGELOG, VERSION, security file warnings
+- `.git/hooks/commit-msg` — Validates Conventional Commits format
+- Source: `.ccg/git-hooks/` (mirrored for tracking). Run `bash .ccg/git-hooks/install.sh` to install.
+
+### 3. Delivery Review (before every commit/push)
+
+Read `.ccg/delivery-review.md` Phase B. Fill it in, show it to you, wait for your confirmation. Never skip.
+
+### Gate Sequence
+
+```
+Pre-flight (Phase A) → You confirm → Write code → Quality gates →
+Cross-review → Version update → Delivery Review (Phase B) → You confirm → Commit
+```
