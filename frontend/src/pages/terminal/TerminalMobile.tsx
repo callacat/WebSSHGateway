@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "../../components/Button";
 import { FileBrowser } from "../../components/FileBrowser";
 import { SystemMonitor } from "../../components/SystemMonitor";
+import { CommandInput } from "./CommandInput";
 import type { TerminalSessionState } from "./useTerminalSession";
 
 type TerminalMobileProps = {
@@ -166,6 +167,12 @@ export function TerminalMobile({ state, onBack }: TerminalMobileProps) {
               </button>
             </div>
           </div>
+          <CommandInput
+            onSend={state.sendInput}
+            disabled={state.connectionState !== "open"}
+            isDark={state.isDark}
+            t={state.t}
+          />
         </div>
 
         <div className={`${activeTab === "files" ? "flex" : "hidden"} h-full flex-col`}>

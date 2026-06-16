@@ -516,6 +516,7 @@ export function useTerminalSocket({
     terminalRef,
     terminalInstance,
     fitAddon,
+    sendInput,
     connectionState,
     reconnectCountdown,
     autoReconnect,

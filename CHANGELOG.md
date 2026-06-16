@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **底部命令输入框**: 在终端页面上方显示终端输出、下方提供独立的命令输入框（移动端 + 桌面端）
+  - 支持多行编辑，`Enter` 发送命令，`Shift+Enter` 换行
+  - 支持 `↑`/`↓` 方向键浏览命令历史（持久化到 sessionStorage，最多 50 条）
+  - 连接断开时自动禁用，防止空发送
+  - 移动端优化：`autoCapitalize`/`autoCorrect`/`spellCheck` 关闭，`maxLength=4096`
+  - 发往终端使用标准回车符 `\r`，确保 SSH 命令正确执行
+  - 深色/浅色主题跟随系统
+
 ## [0.2.0] - 2026-06-09
 
 ### Fixed

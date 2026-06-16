@@ -164,3 +164,26 @@ When working with this codebase:
 | Date | Change |
 |------|--------|
 | 2026-06-09 | Initial codebase scan and CLAUDE.md generation |
+
+## Version Management
+
+This project follows SemVer 2.0 + Conventional Commits 1.0 + Keep a Changelog 1.1.
+
+### Core Rules
+
+1. **All commits must use Conventional Commits** format: `<type>(<scope>): <subject>`
+   - Types: `feat:` / `fix:` / `docs:` / `refactor:` / `perf:` / `test:` / `chore:`
+   - Breaking changes add `!`: `feat(api)!: remove deprecated endpoint`
+2. **Every code change must update `CHANGELOG.md`** [Unreleased] section
+3. **Before release**: `npx commit-and-tag-version` → `git push --follow-tags origin main`
+
+### Version Bumps
+
+| Commit Type | Version Bump | Trigger |
+|-------------|-------------|---------|
+| `feat!:` or `BREAKING CHANGE` | MAJOR +1 | Breaking API change |
+| `feat:` | MINOR +1 | New feature (compatible) |
+| `fix:` | PATCH +1 | Bug fix |
+| `docs:` / `refactor:` / `test:` / `chore:` | No bump | No version change |
+
+See `VERSIONING.md` for full specification.

@@ -151,6 +151,7 @@ export function useTerminalSession(sessionId?: string) {
     terminalRef: socketState.terminalRef,
     terminalInstance: socketState.terminalInstance,
     fitAddon: socketState.fitAddon,
+    sendInput: socketState.sendInput,
     connectionState: socketState.connectionState,
     reconnectCountdown: socketState.reconnectCountdown,
     autoReconnect: socketState.autoReconnect,

@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "../../components/Button";
 import { FileBrowser } from "../../components/FileBrowser";
 import { SystemMonitor } from "../../components/SystemMonitor";
+import { CommandInput } from "./CommandInput";
 import type { TerminalSessionState } from "./useTerminalSession";
 
 type TerminalDesktopProps = {
@@ -145,6 +146,12 @@ export function TerminalDesktop({ state, onBack }: TerminalDesktopProps) {
               onClick={() => state.terminalInstance.current?.focus()}
             />
           </div>
+          <CommandInput
+            onSend={state.sendInput}
+            disabled={state.connectionState !== "open"}
+            isDark={state.isDark}
+            t={state.t}
+          />
           <div className={`p-4 pt-2 ${state.isDark ? "border-t border-slate-800" : "border-t border-slate-200"}`} style={{ height: "280px" }}>
             {state.sessionId ? (
               <FileBrowser
