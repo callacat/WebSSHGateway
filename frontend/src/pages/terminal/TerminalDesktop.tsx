@@ -199,6 +199,7 @@ export function TerminalDesktop({ state, onBack }: TerminalDesktopProps) {
               />
             ) : null}
           </div>
+          )}
         </div>
         <div
           onMouseDown={handleMouseDown}
