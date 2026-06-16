@@ -65,16 +65,12 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
-          COMMIT_MSG=$(git log --format=%s -1)
-          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          curl -s -o /dev/null \
-            "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${TG_CHAT_ID}" \
-            -d "parse_mode=Markdown" \
-            -d "text=🔴 *WebSSH Gateway 构建失败*
-提交: [${COMMIT_MSG:0:60}](${COMMIT_URL})
-日志: [查看详情](${RUN_URL})"
+          MSG=$(git log --format=%s -1)
+          CURL="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
+          DATA="chat_id=${TG_CHAT_ID}&parse_mode=Markdown"
+          TEXT="🔴 WebSSH Gateway build FAILED: ${MSG:0:60}"
+          TEXT="${TEXT}%0Ahttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -s -o /dev/null --data-urlencode "text=${TEXT}" "${CURL}?${DATA}"
 
       - name: Notify on build success
         if: success() && github.event_name != 'pull_request'
@@ -83,15 +79,12 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
-          COMMIT_MSG=$(git log --format=%s -1)
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          curl -s -o /dev/null \
-            "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${TG_CHAT_ID}" \
-            -d "parse_mode=Markdown" \
-            -d "text=🟢 *WebSSH Gateway 构建成功*
-提交: ${COMMIT_MSG:0:60}
-日志: [查看详情](${RUN_URL})"
+          MSG=$(git log --format=%s -1)
+          CURL="https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage"
+          DATA="chat_id=${TG_CHAT_ID}&parse_mode=Markdown"
+          TEXT="🟢 WebSSH Gateway build OK: ${MSG:0:60}"
+          TEXT="${TEXT}%0Ahttps://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -s -o /dev/null --data-urlencode "text=${TEXT}" "${CURL}?${DATA}"
 
       - name: Delete old untagged/orphaned package versions
         continue-on-error: true
