@@ -181,7 +181,7 @@ export function TerminalDesktop({ state, onBack }: TerminalDesktopProps) {
                   ? "cursor-col-resize"
                   : ""
               } ${
-                isDark
+                state.isDark
                   ? "text-slate-600 hover:text-slate-400 hover:bg-slate-800/50 border-t border-slate-800"
                   : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 border-t border-slate-200"
               }`}
