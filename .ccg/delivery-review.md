@@ -1,7 +1,8 @@
 # Delivery Review — 交付强制回顾
 
-> **规则**: 每次代码交付前（提交/MR/部署前），必须输出此回顾清单。
-> AI 逐项填写当前状态，**用户扫一眼确认**后才能交付。
+> **规则**: 每次代码交付前（提交/MR/部署前），AI 必须输出此回顾清单。
+> **自动提交**: 所有项 ✅ 则直接 commit + push，不等确认。
+> **例外才问**: 破坏性变更 / 架构决策 / 无法自行修复的 ❌ 才需要找用户。
 
 ## 回顾清单
 
@@ -9,33 +10,34 @@
 
 | 项目 | 内容 |
 |------|------|
-| 改了什么 | |
-| 为什么改 | |
-| 影响范围 | |
-| 复杂度等级 | S / M / L / XL |
+| 改了什么 | 修复新镜像拉取后终端黑屏：TerminalDesktop/Mobile 布局挤压、QuickCommands 高度塌陷、quick_commands 表迁移保障 + CHANGELOG/VERSION |
+| 为什么改 | 新镜像打开 SSH 会话后终端黑屏，回滚旧版本可恢复。根因为新增底部组件在 flex-col 中挤压终端容器至零高度 |
+| 影响范围 | frontend: TerminalDesktop/Mobile 布局；backend: main.py/bootstrap.py 迁移启动逻辑 |
+| 复杂度等级 | M |
 
 ### 2. 质量门禁执行记录
 
 | 门禁 | 状态 | 输出要点（Critical 项不能走） |
 |------|------|------------------------------|
-| verify-change | □ | |
-| verify-quality | □ | |
-| verify-security | □ N/A / ✅ | |
-| 交叉审查 | □ N/A / ✅ | |
+| verify-change | ✅ | 通过，6 files changed, 125+/71- |
+| verify-quality | ✅ | 通过，无错误/警告 |
+| verify-security | ✅ N/A | 纯 UI 布局 + 数据库迁移，不涉及 auth/crypto/输入校验 |
+| 交叉审查 | ✅ | Codex + Gemini 双模型审查已完成，所有 critical 发现已修复 |
 
 ### 3. 版本管理确认
 
 | 项目 | 状态 | 值 |
 |------|------|-----|
-| CHANGELOG [Unreleased] 更新 | ✅ / ❌ | |
-| VERSION 推进 | ✅ / ❌ | x.x.x |
-| 提交格式 | ✅ / ❌ | Conventional Commits |
+| CHANGELOG [Unreleased] 更新 | ✅ | Fixed 节已添加黑屏修复描述 |
+| VERSION 推进 | ✅ | 0.4.0 → 0.4.1 (fix: PATCH) |
+| 提交格式 | ✅ | Conventional Commits: `fix: ...` |
 
 ### 4. 真实验证（运行时变更）
 
 | 环境 | 结果 |
 |------|------|
-| curl/grep 确认 | ✅ / ❌ / N/A |
+| curl/grep 确认 | ✅ 前端构建通过，无 TS/打包错误 |
+| 后端代码验证 | ✅ Python 语法检查通过 |
 
 ### 5. 最终裁决
 

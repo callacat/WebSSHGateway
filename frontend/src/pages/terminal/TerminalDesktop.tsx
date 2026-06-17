@@ -142,7 +142,7 @@ export function TerminalDesktop({ state, onBack }: TerminalDesktopProps) {
       </div>
       <div ref={containerRef} className="flex flex-1 overflow-hidden">
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex-1 p-4 pb-2 min-h-0">
+          <div className="flex-1 min-h-[120px] p-4 pb-2">
             <div
               ref={state.terminalRef}
               className={`h-full w-full rounded-lg border ${state.isDark ? "border-slate-800" : "border-slate-300 xterm-light"} ${state.sessionInfo?.enhanced_enabled ? "xterm-tmux-enhanced" : ""}`}
@@ -150,56 +150,62 @@ export function TerminalDesktop({ state, onBack }: TerminalDesktopProps) {
               onClick={() => state.terminalInstance.current?.focus()}
             />
           </div>
-          <CommandInput
-            onSend={state.sendInput}
-            disabled={state.connectionState !== "open"}
-            isDark={state.isDark}
-            t={state.t}
-          />
-          <QuickCommands
-            onSend={state.sendInput}
-            disabled={state.connectionState !== "open"}
-            isDark={state.isDark}
-            t={state.t}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              setFileBrowserCollapsed((prev) => {
-                const next = !prev;
-                localStorage.setItem("terminal-filebrowser-collapsed", String(next));
-                return next;
-              });
-            }}
-            className={`flex w-full items-center justify-center py-1 text-xs transition-colors ${
-              isDragging
-                ? "cursor-col-resize"
-                : ""
-            } ${
-              isDark
-                ? "text-slate-600 hover:text-slate-400 hover:bg-slate-800/50 border-t border-slate-800"
-                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 border-t border-slate-200"
-            }`}
-            aria-label={fileBrowserCollapsed ? state.t("展开文件浏览器", "Show file browser") : state.t("隐藏文件浏览器", "Hide file browser")}
-            title={fileBrowserCollapsed ? state.t("展开文件浏览器", "Show file browser") : state.t("隐藏文件浏览器", "Hide file browser")}
-          >
-            <span className={`transition-transform ${fileBrowserCollapsed ? "rotate-180" : ""}`}>▾</span>
-            <span className="mx-2">{state.t("文件浏览器", "File Browser")}</span>
-            <span className={`transition-transform ${fileBrowserCollapsed ? "" : "rotate-180"}`}>▾</span>
-          </button>
-          {!fileBrowserCollapsed && (
-          <div className={`p-4 pt-2 ${state.isDark ? "border-t border-slate-800" : "border-t border-slate-200"}`} style={{ height: "280px" }}>
-            {state.sessionId ? (
-              <FileBrowser
-                sessionId={state.sessionId}
-                isDark={state.isDark}
-                currentDir={state.currentDir}
-                onFileSelect={state.setSelectedFilePath}
-                networkProfile={state.sessionNetworkProfile}
-              />
-            ) : null}
+          {/*
+           * Wrap all bottom-panel UI in flex-shrink-0 so they never compress
+           * the terminal area to zero height (which causes xterm black screen).
+           */}
+          <div className="flex-shrink-0">
+            <CommandInput
+              onSend={state.sendInput}
+              disabled={state.connectionState !== "open"}
+              isDark={state.isDark}
+              t={state.t}
+            />
+            <QuickCommands
+              onSend={state.sendInput}
+              disabled={state.connectionState !== "open"}
+              isDark={state.isDark}
+              t={state.t}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setFileBrowserCollapsed((prev) => {
+                  const next = !prev;
+                  localStorage.setItem("terminal-filebrowser-collapsed", String(next));
+                  return next;
+                });
+              }}
+              className={`flex w-full items-center justify-center py-1 text-xs transition-colors ${
+                isDragging
+                  ? "cursor-col-resize"
+                  : ""
+              } ${
+                isDark
+                  ? "text-slate-600 hover:text-slate-400 hover:bg-slate-800/50 border-t border-slate-800"
+                  : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 border-t border-slate-200"
+              }`}
+              aria-label={fileBrowserCollapsed ? state.t("展开文件浏览器", "Show file browser") : state.t("隐藏文件浏览器", "Hide file browser")}
+              title={fileBrowserCollapsed ? state.t("展开文件浏览器", "Show file browser") : state.t("隐藏文件浏览器", "Hide file browser")}
+            >
+              <span className={`transition-transform ${fileBrowserCollapsed ? "rotate-180" : ""}`}>▾</span>
+              <span className="mx-2">{state.t("文件浏览器", "File Browser")}</span>
+              <span className={`transition-transform ${fileBrowserCollapsed ? "" : "rotate-180"}`}>▾</span>
+            </button>
+            {!fileBrowserCollapsed && (
+            <div className={`p-4 pt-2 ${state.isDark ? "border-t border-slate-800" : "border-t border-slate-200"}`} style={{ height: "280px" }}>
+              {state.sessionId ? (
+                <FileBrowser
+                  sessionId={state.sessionId}
+                  isDark={state.isDark}
+                  currentDir={state.currentDir}
+                  onFileSelect={state.setSelectedFilePath}
+                  networkProfile={state.sessionNetworkProfile}
+                />
+              ) : null}
+            </div>
+            )}
           </div>
-          )}
         </div>
         <div
           onMouseDown={handleMouseDown}

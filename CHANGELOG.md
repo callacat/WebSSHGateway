@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **修复终端黑屏**: 新镜像打开会话后终端黑屏，根因为底部面板组件（CommandInput/QuickCommands/折叠按钮）在 flex-col 布局中挤压终端容器至零高度，触发 xterm FitAddon 计算出 rows=0/cols=0
+  - 桌面端（TerminalDesktop）: 底部面板包裹在 `flex-shrink-0` 容器中，终端区域设置 `min-h-[120px]` 防挤压
+  - 移动端（TerminalMobile）: 同步应用相同的布局保护
+  - QuickCommands 空数据时不返回 null，改为渲染占位行保持高度恒定
+- **QuickCommands 表迁移保障**: 添加 `ensure_quick_commands_table()` 函数显式创建表，并处理并发启动竞争
+
 ### Added
 
 - **底部命令输入框**: 在终端页面上方显示终端输出、下方提供独立的命令输入框（移动端 + 桌面端）

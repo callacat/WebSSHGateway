@@ -64,14 +64,21 @@ export function QuickCommands({
 
   if (loading) {
     return (
-      <div className={`px-3 py-2 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+      <div className={`px-3 py-1.5 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`}>
         {t("加载中...", "Loading...")}
       </div>
     );
   }
 
   if (commands.length === 0) {
-    return null;
+    return (
+      <div className={`border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+        <div className={`flex items-center justify-between px-3 py-1.5 text-xs ${isDark ? "text-slate-500" : "text-slate-400"}`} role="status" aria-label={t("无快捷命令", "No quick commands")}>
+          <span>{t("快捷命令", "Quick Commands")}</span>
+          <span className="text-[10px] opacity-60">{t("暂无", "Empty")}</span>
+        </div>
+      </div>
+    );
   }
 
   return (

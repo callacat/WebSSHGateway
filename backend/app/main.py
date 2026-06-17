@@ -19,6 +19,7 @@ from app.models.session import SessionRecord
 from app.services.bootstrap import (
     ensure_admin_user,
     ensure_connection_arch_columns,
+    ensure_quick_commands_table,
     ensure_session_enhanced_columns,
     ensure_session_note_column,
     ensure_session_order_column,
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
     setup_logging(config.log_level)
 
     database.create_tables()
+    ensure_quick_commands_table(database)
     ensure_session_note_column(database)
     ensure_connection_arch_columns(database)
     ensure_session_enhanced_columns(database)

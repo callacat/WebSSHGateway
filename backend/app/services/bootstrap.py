@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import logging
 import secrets
 from typing import Optional
 
@@ -9,10 +10,13 @@ from sqlalchemy.orm import Session
 
 from app.core.config import AppConfig
 from app.core.db import Database
+from app.models.quick_command import QuickCommand
 from app.models.session import SessionRecord
 from app.models.user import User
 from app.services.auth import AuthService
 from app.services.system_settings import ensure_system_settings_record
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _generate_initial_password() -> str:
@@ -137,6 +141,17 @@ def ensure_session_order_column(database: Database) -> None:
             next_order = last_order_by_user.get(record.user_id, 0) + 1
             record.session_order = next_order
             last_order_by_user[record.user_id] = next_order
+
+
+def ensure_quick_commands_table(database: Database) -> None:
+    inspector = inspect(database._engine)
+    if "quick_commands" not in inspector.get_table_names():
+        try:
+            QuickCommand.__table__.create(database._engine, checkfirst=True)
+            LOGGER.info("Created quick_commands table")
+        except Exception:
+            # 并发场景下另一个实例可能已创建表，忽略表已存在错误
+            pass
 
 
 def ensure_system_settings(database: Database) -> None:

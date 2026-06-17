@@ -134,7 +134,7 @@ export function TerminalMobile({ state, onBack }: TerminalMobileProps) {
 
       <div className="flex-1 min-h-0 pb-16">
         <div className={`${activeTab === "terminal" ? "flex" : "hidden"} h-full flex-col`}>
-          <div className="flex-1 p-3 min-h-0 relative">
+          <div className="flex-1 min-h-[120px] p-3 relative">
             <div
               ref={state.terminalRef}
               className={`h-full w-full rounded-lg border ${state.isDark ? "border-slate-800" : "border-slate-300 xterm-light"} ${state.sessionInfo?.enhanced_enabled ? "xterm-tmux-enhanced" : ""}`}
@@ -168,19 +168,21 @@ export function TerminalMobile({ state, onBack }: TerminalMobileProps) {
               </button>
             </div>
           </div>
-          <CommandInput
-            onSend={state.sendInput}
-            disabled={state.connectionState !== "open"}
-            isDark={state.isDark}
-            t={state.t}
-          />
-          <QuickCommands
-            onSend={state.sendInput}
-            disabled={state.connectionState !== "open"}
-            isDark={state.isDark}
-            t={state.t}
-            initiallyCollapsed
-          />
+          <div className="flex-shrink-0">
+            <CommandInput
+              onSend={state.sendInput}
+              disabled={state.connectionState !== "open"}
+              isDark={state.isDark}
+              t={state.t}
+            />
+            <QuickCommands
+              onSend={state.sendInput}
+              disabled={state.connectionState !== "open"}
+              isDark={state.isDark}
+              t={state.t}
+              initiallyCollapsed
+            />
+          </div>
         </div>
 
         <div className={`${activeTab === "files" ? "flex" : "hidden"} h-full flex-col`}>
