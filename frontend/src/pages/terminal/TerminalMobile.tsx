@@ -3,7 +3,6 @@ import { Button } from "../../components/Button";
 import { FileBrowser } from "../../components/FileBrowser";
 import { SystemMonitor } from "../../components/SystemMonitor";
 import { CommandInput } from "./CommandInput";
-import { QuickCommands } from "./QuickCommands";
 import type { TerminalSessionState } from "./useTerminalSession";
 
 type TerminalMobileProps = {
@@ -174,13 +173,6 @@ export function TerminalMobile({ state, onBack }: TerminalMobileProps) {
               disabled={state.connectionState !== "open"}
               isDark={state.isDark}
               t={state.t}
-            />
-            <QuickCommands
-              onSend={state.sendInput}
-              disabled={state.connectionState !== "open"}
-              isDark={state.isDark}
-              t={state.t}
-              initiallyCollapsed
             />
           </div>
         </div>

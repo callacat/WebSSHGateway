@@ -3,7 +3,6 @@ import { Button } from "../../components/Button";
 import { FileBrowser } from "../../components/FileBrowser";
 import { SystemMonitor } from "../../components/SystemMonitor";
 import { CommandInput } from "./CommandInput";
-import { QuickCommands } from "./QuickCommands";
 import type { TerminalSessionState } from "./useTerminalSession";
 
 type TerminalDesktopProps = {
@@ -156,12 +155,6 @@ export function TerminalDesktop({ state, onBack }: TerminalDesktopProps) {
            */}
           <div className="flex-shrink-0">
             <CommandInput
-              onSend={state.sendInput}
-              disabled={state.connectionState !== "open"}
-              isDark={state.isDark}
-              t={state.t}
-            />
-            <QuickCommands
               onSend={state.sendInput}
               disabled={state.connectionState !== "open"}
               isDark={state.isDark}

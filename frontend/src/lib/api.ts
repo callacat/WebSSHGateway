@@ -47,10 +47,6 @@ const CLIENT_TEXT_MAP: Record<string, { zh: string; en: string }> = {
   "下载失败": { zh: "下载失败", en: "Download failed" },
   "读取文件失败": { zh: "读取文件失败", en: "Failed to read file" },
   "保存文件失败": { zh: "保存文件失败", en: "Failed to save file" },
-  "加载快捷命令失败": { zh: "加载快捷命令失败", en: "Failed to load quick commands" },
-  "创建快捷命令失败": { zh: "创建快捷命令失败", en: "Failed to create quick command" },
-  "更新快捷命令失败": { zh: "更新快捷命令失败", en: "Failed to update quick command" },
-  "删除快捷命令失败": { zh: "删除快捷命令失败", en: "Failed to delete quick command" },
 };
 
 function localizeClientText(message: string, language: AppLanguage = getStoredLanguage()): string {
@@ -623,27 +619,6 @@ export type GlobalSystemSettings = {
   show_session_status_summary: boolean;
 };
 
-export type QuickCommandItem = {
-  id: number;
-  name: string;
-  group_name: string;
-  command: string;
-  sort_order: number;
-};
-
-export type QuickCommandCreate = {
-  name: string;
-  group_name?: string;
-  command: string;
-};
-
-export type QuickCommandUpdate = {
-  name?: string;
-  group_name?: string;
-  command?: string;
-  sort_order?: number;
-};
-
 export async function getSystemStats(sessionId: string): Promise<SystemStats> {
   const response = await fetch(`${HTTP_BASE}/system/stats/${sessionId}`, {
     headers: { ...getAuthHeader() }
@@ -1014,30 +989,3 @@ export async function writeFile(sessionId: string, path: string, content: string
   }
 }
 
-// ── Quick Commands ──────────────────────────────────────
-
-export async function listQuickCommands(): Promise<QuickCommandItem[]> {
-  return request<QuickCommandItem[]>(`${HTTP_BASE}/quick-commands`, {}, "加载快捷命令失败");
-}
-
-export async function createQuickCommand(payload: QuickCommandCreate): Promise<QuickCommandItem> {
-  return request<QuickCommandItem>(`${HTTP_BASE}/quick-commands`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  }, "创建快捷命令失败");
-}
-
-export async function updateQuickCommand(commandId: number, payload: QuickCommandUpdate): Promise<QuickCommandItem> {
-  return request<QuickCommandItem>(`${HTTP_BASE}/quick-commands/${commandId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  }, "更新快捷命令失败");
-}
-
-export async function deleteQuickCommand(commandId: number): Promise<void> {
-  await request<void>(`${HTTP_BASE}/quick-commands/${commandId}`, {
-    method: "DELETE",
-  }, "删除快捷命令失败");
-}
