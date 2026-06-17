@@ -205,9 +205,22 @@ Before writing code, I must show you three options: `[Claude solo]` / `[Codex+Ge
 - `.git/hooks/commit-msg` — Validates Conventional Commits format
 - Source: `.ccg/git-hooks/` (mirrored for tracking). Run `bash .ccg/git-hooks/install.sh` to install.
 
-### 3. Delivery Review (before every commit/push)
+### 3. Delivery Review + Auto Commit
 
-Read `.ccg/delivery-review.md` Phase B. Fill it in, show it to you, wait for your confirmation. Never skip.
+Read `.ccg/delivery-review.md` and fill all items. If all pass → **auto commit + push without asking**.
+
+Only ask for confirmation when:
+- Breaking change (MAJOR version bump)
+- Architecture decision requiring your input
+- A ❌ item found that I cannot fix myself
+
+### 4. Build Watch (Post-Push)
+
+After `git push`, automatically start background build monitor:
+```bash
+/home/agent/bin/gha-watch.sh --repo callacat/WebSSHGateway --daemon &
+```
+Build result arrives via TG/QQ. On failure, auto-fix and retry (max 2 rounds).
 
 ### Gate Sequence
 
