@@ -5,6 +5,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # SECRET_KEY must be 16/24/32 bytes. Generate your own, e.g.: openssl rand -hex 32
       - SECRET_KEY=replace-with-32-char-secret-123456
       - DATABASE_URL=sqlite:////data/app.db
       - PORT=8080

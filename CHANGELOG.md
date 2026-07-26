@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- **SECRET_KEY 生成指引**: 在部署文档（`docs/DEPLOYMENT.md`、`docs/DEPLOYMENT.en.md`）新增「快速生成 32 位 SECRET_KEY」小节，提供 `openssl` / `/dev/urandom` / `python secrets` / `uuidgen` 四种生成命令及一键写回 `.env` 的便捷写法，并说明 `SECRET_KEY` 同时用于 JWT HS256 签名与 AES-GCM 凭据加密、长度必须为 16/24/32 字节的约束
+- **配置模板生成提示**: 在 `.env.example` 与 `docker-compose.yml` 的 `SECRET_KEY` 占位值上方补充生成命令注释，避免沿用示例值
+
 ## [0.3.0] - 2026-06-17
 
 ### Fixed

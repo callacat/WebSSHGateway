@@ -27,6 +27,36 @@ cp .env.example .env
 
 安全提示：上线前请再次确认 `SECRET_KEY` 已替换，否则会导致鉴权令牌与会话安全风险。
 
+#### 快速生成 32 位 SECRET_KEY
+
+任选以下一种方式生成一个 32 位（字节）的高强度随机值，直接填入 `.env` 的 `SECRET_KEY=` 后面：
+
+```bash
+# 方式 1：openssl（推荐，几乎所有 Linux/macOS 自带，输出 64 位十六进制 = 32 字节）
+openssl rand -hex 32
+
+# 方式 2：读取 /dev/urandom（无 openssl 时可用）
+head -c 32 /dev/urandom | xxd -p -c 64
+# 或（无 xxd 时）：head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n'
+
+# 方式 3：Python（任意平台通用，要求 Python 3.6+）
+python3 -c 'import secrets; print(secrets.token_hex(32))'
+
+# 方式 4：uuidgen + 拼接（仅应急，强度弱于上面三种；两个 128 位 UUID 去横杠拼接得到 32 字符）
+echo "$(uuidgen | tr -d '-')$(uuidgen | tr -d '-')"
+```
+
+> 说明：`SECRET_KEY` 同时用于 JWT HS256 签名与 AES-GCM 凭据加密，长度必须落在 16 / 24 / 32 字节三种之一，因此上述命令统一生成 32 字节（即 64 位十六进制字符串）的值。生成的值彼此等价可用，任选其一即可。
+
+一键写入 `.env` 的便捷写法：
+
+```bash
+# 生成并直接替换 .env 中的 SECRET_KEY 行（若 .env 尚未有该行，请新增）
+SECRET_KEY_NEW=$(openssl rand -hex 32)
+sed -i "s|^SECRET_KEY=.*|SECRET_KEY=${SECRET_KEY_NEW}|" .env
+grep '^SECRET_KEY=' .env  # 确认已写入
+```
+
 ## 3. 本地开发部署
 
 ### 3.1 启动后端

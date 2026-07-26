@@ -25,6 +25,36 @@ Important variables:
 
 Security reminder: verify `SECRET_KEY` is replaced before going live, otherwise authentication/session security is at risk.
 
+#### Quickly generate a 32-byte SECRET_KEY
+
+Pick any one of the commands below to generate a strong 32-byte (i.e. 64 hex chars) random value, then paste it after `SECRET_KEY=` in your `.env`:
+
+```bash
+# Option 1: openssl (recommended; bundled on almost all Linux/macOS; outputs 64 hex chars = 32 bytes)
+openssl rand -hex 32
+
+# Option 2: read /dev/urandom (when openssl is unavailable)
+head -c 32 /dev/urandom | xxd -p -c 64
+# or, without xxd:   head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n'
+
+# Option 3: Python (works on any platform; needs Python 3.6+)
+python3 -c 'import secrets; print(secrets.token_hex(32))'
+
+# Option 4: uuidgen + concat (fallback only; weaker than the options above; two 128-bit UUIDs stripped of dashes yield 32 chars)
+echo "$(uuidgen | tr -d '-')$(uuidgen | tr -d '-')"
+```
+
+> Note: `SECRET_KEY` is used for both JWT HS256 signing and AES-GCM credential encryption, so its length must be exactly 16, 24, or 32 bytes. The commands above therefore produce a 32-byte value (a 64-character hex string). All of them are equivalent and interchangeable — pick whichever is available on your system.
+
+Convenience one-liner to write it straight into `.env`:
+
+```bash
+# Generate and replace the SECRET_KEY line in .env (add the line first if it does not exist)
+SECRET_KEY_NEW=$(openssl rand -hex 32)
+sed -i "s|^SECRET_KEY=.*|SECRET_KEY=${SECRET_KEY_NEW}|" .env
+grep '^SECRET_KEY=' .env  # confirm it was written
+```
+
 ## 3. Local Development
 
 ### Backend
