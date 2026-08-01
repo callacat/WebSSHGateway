@@ -66,7 +66,7 @@ docker pull ghcr.io/callacat/WebSSHGateway:latest
 docker run -d -p 8080:8080 \
   -e SECRET_KEY="your-32-char-secret-key-here-change-it" \
   -v webssh-data:/data \
-  ghcr.io/callacat/WebSSHGateway:latest
+  ghcr.io/callacat/websshgateway:latest
 ```
 
 ```bash
