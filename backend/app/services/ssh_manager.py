@@ -639,8 +639,15 @@ class SessionManager:
                 f"{quoted_remote_binary} set-option -t {quoted_fingerprint} destroy-unattached off",
                 check=False,
             )
+            # Intentionally keep tmux mouse mode OFF.
+            # With mouse on, TUI programs (vim/htop/opencode etc.) that enable SGR mouse
+            # reporting can have their \x1b[<...M sequences echoed back as literal text into
+            # the pane when tmux's mouse state machine misbehaves during resize/redraw,
+            # polluting the pane buffer with garbage like "35;82;22M35;81;22M..." that then
+            # gets replayed to every new WebSocket client. This is a keyboard-only SSH
+            # gateway, so mouse support has no functional value.
             res_mouse = await client.run(
-                f"{quoted_remote_binary} set-option -t {quoted_fingerprint} mouse on",
+                f"{quoted_remote_binary} set-option -t {quoted_fingerprint} mouse off",
                 check=False,
             )
             res_border = await client.run(f"{quoted_remote_binary} set-window-option -t {target_window} pane-border-status off", check=False)
