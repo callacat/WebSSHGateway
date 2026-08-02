@@ -23,9 +23,10 @@ COPY session-transfer-files /app/session-transfer-files
 COPY --from=frontend-build /backend/frontend/dist /app/backend/frontend/dist
 
 WORKDIR /app/backend
-RUN mkdir -p /data && chown -R appuser:appuser /data
+RUN mkdir -p /data && chown -R appuser:appuser /data \
+    && chmod +x /app/backend/docker-entrypoint.sh
 USER appuser
 
 EXPOSE 8080
 
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+ENTRYPOINT ["/app/backend/docker-entrypoint.sh"]
