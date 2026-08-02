@@ -25,14 +25,38 @@ class AppConfig:
     keepalive_binary_dir: str
 
 
+def _decode_secret_key(value: str) -> bytes:
+    """把 SECRET_KEY 环境变量值规范化为密钥字节。
+
+    支持两种形式：
+    1. hex 字符串（如 ``openssl rand -hex 16`` 输出 32 字符 / ``-hex 24`` 输出
+       48 字符 / ``-hex 32`` 输出 64 字符），解码后为 16/24/32 字节；
+    2. 原始字符串（如 ``your-32-char-secret-key-here``），按 UTF-8 编码后
+       长度需为 16/24/32 字节。
+    仅当解码/编码后的字节长度落在 {16, 24, 32} 时才视为合法。
+    """
+    candidate = value.strip()
+    if len(candidate) in {32, 48, 64}:
+        try:
+            decoded = bytes.fromhex(candidate)
+        except ValueError:
+            decoded = None
+        if decoded is not None and len(decoded) in {16, 24, 32}:
+            return decoded
+    encoded = candidate.encode("utf-8")
+    if len(encoded) not in {16, 24, 32}:
+        raise RuntimeError(
+            "SECRET_KEY must be 16/24/32 bytes; suggest using `openssl rand -hex 16` "
+            "(32 hex chars = 16 bytes) or `openssl rand -hex 32` (64 hex chars = 32 bytes)"
+        )
+    return encoded
+
+
 def load_config() -> AppConfig:
     secret_value = os.getenv("SECRET_KEY", "")
-    secret_keys = [key.strip().encode("utf-8") for key in secret_value.split(",") if key.strip()]
-    if not secret_keys:
+    if not secret_value.strip():
         raise RuntimeError("SECRET_KEY is required")
-
-    if any(len(key) not in {16, 24, 32} for key in secret_keys):
-        raise RuntimeError("SECRET_KEY must be 16/24/32 bytes; suggest using 32 chars")
+    secret_keys = [_decode_secret_key(key) for key in secret_value.split(",") if key.strip()]
 
     database_url = os.getenv("DATABASE_URL", "sqlite:////data/app.db")
     jwt_issuer = os.getenv("JWT_ISSUER", "webssh-gateway")

@@ -62,9 +62,9 @@ WebSSH Gateway 是一个面向运维和开发场景的浏览器 SSH 网关。你
 # 从 ghcr.io 拉取镜像
 docker pull ghcr.io/callacat/WebSSHGateway:latest
 
-# 快速启动（SECRET_KEY 必须替换，32 位字符）
+# 快速启动（SECRET_KEY 必须替换，需 32 字节；可用 openssl rand -hex 32 生成 64 位 hex 字符 = 32 字节）
 docker run -d -p 8080:8080 \
-  -e SECRET_KEY="your-32-char-secret-key-here-change-it" \
+  -e SECRET_KEY="c8ab6d4eb00de6a5597f8f7423a6cfff2bcfc5d992a06957df3aab23ea2abcf7" \
   -v webssh-data:/data \
   ghcr.io/callacat/websshgateway:latest
 ```

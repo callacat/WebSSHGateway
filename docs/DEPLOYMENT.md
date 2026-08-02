@@ -19,7 +19,7 @@ cp .env.example .env
 
 关键变量说明：
 
-- `SECRET_KEY`：必须为 16/24/32 字节长度，建议 32 字符。务必修改为你自己的高强度随机值，不可使用示例值。
+- `SECRET_KEY`：必须为 16/24/32 字节长度，推荐 32 字节（即 64 位十六进制字符）。务必修改为你自己的高强度随机值，不可使用示例值。
 - `DATABASE_URL`：默认 `sqlite:////data/app.db`。
 - `SSH_KNOWN_HOSTS`：已知主机文件路径。
 - `SSH_ALLOW_UNKNOWN_HOSTS`：是否允许未知主机。
@@ -27,9 +27,9 @@ cp .env.example .env
 
 安全提示：上线前请再次确认 `SECRET_KEY` 已替换，否则会导致鉴权令牌与会话安全风险。
 
-#### 快速生成 32 位 SECRET_KEY
+#### 快速生成 32 字节 SECRET_KEY
 
-任选以下一种方式生成一个 32 位（字节）的高强度随机值，直接填入 `.env` 的 `SECRET_KEY=` 后面：
+任选以下一种方式生成一个 32 字节（即 64 位十六进制字符）的高强度随机值，直接填入 `.env` 的 `SECRET_KEY=` 后面：
 
 ```bash
 # 方式 1：openssl（推荐，几乎所有 Linux/macOS 自带，输出 64 位十六进制 = 32 字节）
@@ -42,7 +42,7 @@ head -c 32 /dev/urandom | xxd -p -c 64
 # 方式 3：Python（任意平台通用，要求 Python 3.6+）
 python3 -c 'import secrets; print(secrets.token_hex(32))'
 
-# 方式 4：uuidgen + 拼接（仅应急，强度弱于上面三种；两个 128 位 UUID 去横杠拼接得到 32 字符）
+# 方式 4：uuidgen + 拼接（仅应急，强度弱于上面三种；两个 128 位 UUID 去横杠拼接得到 64 字符 = 32 字节）
 echo "$(uuidgen | tr -d '-')$(uuidgen | tr -d '-')"
 ```
 
@@ -112,7 +112,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8080
 
 Docker Hub 镜像：`https://hub.docker.com/r/beibeizi/websshgateway`
 
-快速启动示例（注意：`SECRET_KEY` 仅为示例，自行部署必须替换，32 位 UUID 即可）：
+快速启动示例（注意：`SECRET_KEY` 仅为示例，自行部署必须替换，推荐使用 `openssl rand -hex 32` 生成的 64 位十六进制值）：
 
 ```bash
 docker run -d -p 8080:8080 -e SECRET_KEY="67e457b4eab14012b34382b3d634f297" beibeizi/websshgateway:latest

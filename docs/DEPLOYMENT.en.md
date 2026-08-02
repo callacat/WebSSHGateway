@@ -40,7 +40,7 @@ head -c 32 /dev/urandom | xxd -p -c 64
 # Option 3: Python (works on any platform; needs Python 3.6+)
 python3 -c 'import secrets; print(secrets.token_hex(32))'
 
-# Option 4: uuidgen + concat (fallback only; weaker than the options above; two 128-bit UUIDs stripped of dashes yield 32 chars)
+# Option 4: uuidgen + concat (fallback only; weaker than the options above; two 128-bit UUIDs stripped of dashes yield 64 hex chars = 32 bytes)
 echo "$(uuidgen | tr -d '-')$(uuidgen | tr -d '-')"
 ```
 

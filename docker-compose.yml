@@ -5,8 +5,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # SECRET_KEY must be 16/24/32 bytes. Generate your own, e.g.: openssl rand -hex 32
-      - SECRET_KEY=replace-with-32-char-secret-123456
+      # SECRET_KEY must be exactly 16/24/32 bytes. `openssl rand -hex 32` prints a
+      # 64-char hex string (64 chars = 32 bytes), which is the recommended length.
+      # Replace the example below with your own generated value.
+      - SECRET_KEY=c8ab6d4eb00de6a5597f8f7423a6cfff2bcfc5d992a06957df3aab23ea2abcf7
       - DATABASE_URL=sqlite:////data/app.db
       - PORT=8080
       - LOG_LEVEL=INFO

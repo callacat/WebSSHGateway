@@ -60,7 +60,7 @@ See [docs/DEPLOYMENT.en.md](./docs/DEPLOYMENT.en.md) for step-by-step setup.
 
 Docker Hub image: `https://hub.docker.com/r/beibeizi/websshgateway`
 
-Quick start example (note: `SECRET_KEY` is an example, replace it in your own deployment; a 32‑char UUID is enough):
+Quick start example (note: `SECRET_KEY` is an example, replace it in your own deployment; generate a 32-byte value with `openssl rand -hex 32`, which prints 64 hex chars = 32 bytes):
 
 ```bash
 docker run -d -p 8080:8080 -e SECRET_KEY="67e457b4eab14012b34382b3d634f297" beibeizi/websshgateway:latest
