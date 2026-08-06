@@ -88,6 +88,10 @@ jobs:
           curl -s -o /dev/null --data-urlencode "text=${TEXT}" "${CURL}?${DATA}"
 
       - name: Delete old untagged/orphaned package versions
+        # 仅在发布 tag 时清理孤儿版本：每次 main push 都调用 GHCR REST API
+        # （list + 逐条 DELETE）会触发 GitHub 次级限流，导致同一 token 的
+        # 后续镜像 push 被 403 拒绝（failed to push: secondary rate limit）。
+        if: startsWith(github.ref, 'refs/tags/v')
         continue-on-error: true
         shell: bash
         run: |
@@ -105,4 +109,5 @@ jobs:
             echo "Deleting orphaned version: $id"
             curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
               "https://api.github.com/users/${OWNER}/packages/container/${PACKAGE}/versions/$id"
+            sleep 2
           done
