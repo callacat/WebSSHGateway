@@ -105,6 +105,26 @@ _MESSAGE_CATALOG: dict[str, dict[str, str]] = {
         "zh": "会话未激活",
         "en": "Session not active",
     },
+    "ssh_connection_failed": {
+        "zh": "无法连接到目标主机，请检查主机地址、端口与网络连通性",
+        "en": "Failed to connect to target host. Check host address, port and network reachability",
+    },
+    "ssh_auth_failed": {
+        "zh": "SSH 认证失败，请检查用户名、密码或私钥是否正确",
+        "en": "SSH authentication failed. Check username, password or private key",
+    },
+    "ssh_host_key_failed": {
+        "zh": "目标主机指纹校验失败，请检查 known_hosts 或关闭主机指纹校验",
+        "en": "Host key verification failed. Check known_hosts or allow unknown hosts",
+    },
+    "ssh_connect_timeout": {
+        "zh": "连接目标主机超时，请检查网络连通性",
+        "en": "Connection to target host timed out. Check network reachability",
+    },
+    "ssh_connect_error": {
+        "zh": "SSH 连接失败，请检查连接配置",
+        "en": "SSH connection failed. Check connection settings",
+    },
 }
 
 _MESSAGE_ALIAS_TO_KEY: dict[str, str] = {}

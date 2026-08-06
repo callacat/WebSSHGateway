@@ -28,26 +28,32 @@ class AppConfig:
 def _decode_secret_key(value: str) -> bytes:
     """把 SECRET_KEY 环境变量值规范化为密钥字节。
 
-    支持两种形式：
-    1. hex 字符串（如 ``openssl rand -hex 16`` 输出 32 字符 / ``-hex 24`` 输出
-       48 字符 / ``-hex 32`` 输出 64 字符），解码后为 16/24/32 字节；
-    2. 原始字符串（如 ``your-32-char-secret-key-here``），按 UTF-8 编码后
-       长度需为 16/24/32 字节。
-    仅当解码/编码后的字节长度落在 {16, 24, 32} 时才视为合法。
+    兼容三种形式：
+    1. 64 字符 hex 字符串（``openssl rand -hex 32`` 输出）→ 解码为 32 字节；
+    2. 48 字符 hex 字符串（``openssl rand -hex 24`` 输出）→ 解码为 24 字节；
+    3. 原始字符串（任意 16/24/32 字符，如旧文档的 32 字符随机串）→ 按 UTF-8
+       编码后长度需为 16/24/32 字节。
+
+    关键约束：32 字符的字符串**一律按原始字节处理，不做 hex 解码**。历史上
+    SECRET_KEY 直接按字符串 UTF-8 编码作为密钥，32 字符随机串（如
+    ``08e7550a0784d000aca63d99dca08962``）是既有部署的常见配置；若把它当
+    16 字节 hex 解码，会让旧数据的 AES-GCM 凭据无法解密，导致已保存的连接
+    全部失效。要生成 16 字节密钥请使用 ``openssl rand -hex 16``（输出 32 字符
+    hex，但那是新部署的选择；对既有部署保持原样最安全）。
     """
     candidate = value.strip()
-    if len(candidate) in {32, 48, 64}:
+    if len(candidate) in {48, 64}:
         try:
             decoded = bytes.fromhex(candidate)
         except ValueError:
             decoded = None
-        if decoded is not None and len(decoded) in {16, 24, 32}:
+        if decoded is not None and len(decoded) in {24, 32}:
             return decoded
     encoded = candidate.encode("utf-8")
     if len(encoded) not in {16, 24, 32}:
         raise RuntimeError(
-            "SECRET_KEY must be 16/24/32 bytes; suggest using `openssl rand -hex 16` "
-            "(32 hex chars = 16 bytes) or `openssl rand -hex 32` (64 hex chars = 32 bytes)"
+            "SECRET_KEY must be 16/24/32 bytes; suggest using `openssl rand -hex 32` "
+            "(64 hex chars = 32 bytes)"
         )
     return encoded
 

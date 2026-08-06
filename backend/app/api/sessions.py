@@ -34,6 +34,31 @@ from app.services.types import PtyInfo
 logger = get_logger(__name__)
 
 
+def _ssh_connect_error_detail(exc: Exception) -> str:
+    """把 SSH 连接/认证异常映射为面向用户的 i18n 提示（由 HTTPException 中间件本地化）。
+
+    返回的是 i18n catalog 中的 zh 文案，`main.py` 的异常处理器会按请求语言
+    自动翻译；原始异常信息记录在服务端日志中，不直接暴露给用户。
+    """
+    try:
+        import asyncssh
+    except ImportError:
+        asyncssh = None
+
+    if asyncssh is not None and isinstance(exc, asyncssh.PermissionDenied):
+        return "SSH 认证失败，请检查用户名、密码或私钥是否正确"
+    if asyncssh is not None and isinstance(exc, asyncssh.HostKeyNotVerifiable):
+        return "目标主机指纹校验失败，请检查 known_hosts 或关闭主机指纹校验"
+    if isinstance(exc, ValueError):
+        # ssh_manager._open_client 在私钥无法导入时抛 ValueError("无效的私钥格式或密码错误")
+        return "无效的私钥格式或密码错误"
+    if isinstance(exc, TimeoutError):
+        return "连接目标主机超时，请检查网络连通性"
+    if isinstance(exc, OSError):
+        return "无法连接到目标主机，请检查主机地址、端口与网络连通性"
+    return "SSH 连接失败，请检查连接配置"
+
+
 _DA_RESPONSE_SEQUENCES: tuple[str, ...] = tuple(
     sorted(
         {
@@ -218,12 +243,33 @@ async def prepare_session(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Connection not found")
 
     crypto = CryptoService(state.config.secret_keys)
-    auth_data = json.loads(conn.auth_data)
-    decrypted = crypto.decrypt(EncryptedPayload(nonce=auth_data["nonce"], ciphertext=auth_data["ciphertext"]))
-    auth_payload = json.loads(decrypted)
+    try:
+        auth_data = json.loads(conn.auth_data)
+        decrypted = crypto.decrypt(EncryptedPayload(nonce=auth_data["nonce"], ciphertext=auth_data["ciphertext"]))
+        auth_payload = json.loads(decrypted)
+    except Exception as exc:
+        logger.error(
+            "prepare_session decrypt failed conn_id=%s user_id=%s error=%s",
+            conn.id,
+            user.id,
+            exc,
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="decrypt_payload_failed")
 
     session_manager: SessionManager = state.session_manager
-    remote_arch, remote_os = await session_manager.detect_remote_platform(conn, auth_payload)
+    try:
+        remote_arch, remote_os = await session_manager.detect_remote_platform(conn, auth_payload)
+    except Exception as exc:
+        logger.error(
+            "prepare_session ssh connect failed conn_id=%s user_id=%s host=%s port=%s error=%s",
+            conn.id,
+            user.id,
+            conn.host,
+            conn.port,
+            exc,
+        )
+        detail = _ssh_connect_error_detail(exc)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
     conn.remote_arch = remote_arch
     conn.remote_os = remote_os
 
@@ -278,9 +324,18 @@ async def create_session(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Connection not found")
 
     crypto = CryptoService(state.config.secret_keys)
-    auth_data = json.loads(conn.auth_data)
-    decrypted = crypto.decrypt(EncryptedPayload(nonce=auth_data["nonce"], ciphertext=auth_data["ciphertext"]))
-    auth_payload = json.loads(decrypted)
+    try:
+        auth_data = json.loads(conn.auth_data)
+        decrypted = crypto.decrypt(EncryptedPayload(nonce=auth_data["nonce"], ciphertext=auth_data["ciphertext"]))
+        auth_payload = json.loads(decrypted)
+    except Exception as exc:
+        logger.error(
+            "create_session decrypt failed conn_id=%s user_id=%s error=%s",
+            conn.id,
+            user.id,
+            exc,
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="decrypt_payload_failed")
     pty = PtyInfo(term=payload.term, rows=payload.rows, cols=payload.cols)
 
     session_manager: SessionManager = state.session_manager
@@ -298,7 +353,18 @@ async def create_session(
     remote_arch = (conn.remote_arch or "").strip()
     remote_os = (conn.remote_os or "").strip()
     if not remote_arch or not remote_os:
-        detected_arch, detected_os = await session_manager.detect_remote_platform(conn, auth_payload)
+        try:
+            detected_arch, detected_os = await session_manager.detect_remote_platform(conn, auth_payload)
+        except Exception as exc:
+            logger.error(
+                "create_session ssh connect failed conn_id=%s user_id=%s host=%s port=%s error=%s",
+                conn.id,
+                user.id,
+                conn.host,
+                conn.port,
+                exc,
+            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=_ssh_connect_error_detail(exc))
         conn.remote_arch = detected_arch
         conn.remote_os = detected_os
         remote_arch = detected_arch
@@ -382,9 +448,18 @@ async def retry_enhanced_session(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Connection not found")
 
     crypto = CryptoService(state.config.secret_keys)
-    auth_data = json.loads(conn.auth_data)
-    decrypted = crypto.decrypt(EncryptedPayload(nonce=auth_data["nonce"], ciphertext=auth_data["ciphertext"]))
-    auth_payload = json.loads(decrypted)
+    try:
+        auth_data = json.loads(conn.auth_data)
+        decrypted = crypto.decrypt(EncryptedPayload(nonce=auth_data["nonce"], ciphertext=auth_data["ciphertext"]))
+        auth_payload = json.loads(decrypted)
+    except Exception as exc:
+        logger.error(
+            "retry_enhanced_session decrypt failed conn_id=%s user_id=%s error=%s",
+            conn.id,
+            user.id,
+            exc,
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="decrypt_payload_failed")
 
     session_manager: SessionManager = state.session_manager
     broadcaster: SessionBroadcaster = state.session_broadcaster
