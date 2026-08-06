@@ -58,7 +58,7 @@ SKIP_BYPASS=$(git commit --allow-empty -n 2>/dev/null; echo "noop")
 header "📋 [1/4] CHANGELOG 同步检查"
 
 if echo "$STAGED_FILES" | grep -q 'CHANGELOG\.md'; then
-  if git diff --cached CHANGELOG.md | grep -q '## \[Unreleased\]'; then
+  if git show :CHANGELOG.md 2>/dev/null | grep -q '^## \[Unreleased\]'; then
     pass "CHANGELOG.md [Unreleased] 节已更新"
   else
     fail "CHANGELOG.md 有变更但缺少 [Unreleased] 节"
